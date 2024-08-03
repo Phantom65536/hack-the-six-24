@@ -192,6 +192,24 @@ def upload_driving_summary():
 
     return jsonify(response), 200
 
+@app.route('/api/getall', methods=['GET'])
+def get_all_summaries():
+    """
+    Endpoint to get all driving summaries.
+    ---
+    responses:
+        200:
+            description: A JSON response with all the summaries
+        500:
+            description: Gemini API error
+    """
+    print("GETTNG ALLLLL")
+    print(os.getenv('MONGODB_URI'))
+    summaries = list(drive_col.find())
+    for summary in summaries:
+        summary['_id'] = str(summary['_id'])
+    return jsonify(summaries), 200
+
 @app.route('/api/query', methods=['POST'])
 def query_summary():
     """
