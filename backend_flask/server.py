@@ -129,20 +129,6 @@ def upload_driving_summary():
 
     video_file_name = video_file.name
 
-    # Check whether the file is ready to be used.
-    try:
-        video_file = None
-        while video_file is None or video_file.state.name == "PROCESSING":
-            print('.', end='')
-            time.sleep(2)
-            video_file = genai.get_file(video_file_name)
-
-        if video_file.state.name == "FAILED":
-          raise ValueError(video_file.state.name)
-        print(f"Completed upload: {video_file.uri}")
-    except Exception as e:
-        return jsonify({"Error when retrieving video file": str(e)}), 500
-
     # List all files
     for file in genai.list_files():
         print(f"{file.display_name}, NAME: {file.name}, URI: {file.uri}")
