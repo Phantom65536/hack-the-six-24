@@ -92,6 +92,7 @@ def upload_driving_summary():
 
     # Extracting data from the JSON payload
     video_file_name = data.get('video_file_name')
+    gcs_file_name = data.get('gcs_file_name')
     shoulder_check_done = data.get('shoulder_check_done')
     number_of_turns = data.get('number_of_turns')
     drowsiness_detected = data.get('drowsiness_detected')
@@ -113,6 +114,7 @@ def upload_driving_summary():
 
         if video_file.state.name == "FAILED":
           raise ValueError(video_file.state.name)
+        print(f"Completed upload: {video_file.uri}")
     except Exception as e:
         return jsonify({"Error when retrieving video file": str(e)}), 500
 
@@ -184,9 +186,11 @@ def upload_driving_summary():
         "drowsiness_detected": drowsiness_detected,
         "summary": summary,
         "title": title,
-        "embedding": embedding
+        "embedding": embedding,
+        "gcs_file_name": gcs_file_name
     }
 
+    print("Inserting response to MongoDB")
     drive_col.insert_one(response)
     response['_id'] = str(response['_id'])
 
