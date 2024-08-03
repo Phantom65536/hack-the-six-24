@@ -1,14 +1,9 @@
-import React from 'react'
+import React from 'react';
 
 const Profile = () => {
+  // Use OAuth2.
 
-    // Use OAuth2.
+  return <div>Profile Page</div>;
+};
 
-  return (
-    <div>
-      Profile Page
-    </div>
-  )
-}
-
-export default Profile
+export default Profile;
