@@ -5,7 +5,15 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 const VideoPlayer = ({ videoUrl, notifications }) => {
   return (
     <Box sx={{ display: 'flex', height: '100vh', backgroundColor: '#000' }}>
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <Box
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <Typography variant="h6" color="white" gutterBottom>
           Live Video Stream
         </Typography>
@@ -33,7 +41,12 @@ const VideoPlayer = ({ videoUrl, notifications }) => {
         <Box sx={{ mt: 2 }}>
           {notifications && notifications.length > 0 ? (
             notifications.map((notification, index) => (
-              <Typography key={index} variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+              <Typography
+                key={index}
+                variant="body2"
+                color="textSecondary"
+                sx={{ mb: 1 }}
+              >
                 {notification}
               </Typography>
             ))

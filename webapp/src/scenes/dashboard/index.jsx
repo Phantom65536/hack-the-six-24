@@ -1,15 +1,30 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Box, Button, Typography, useTheme } from '@mui/material';
+import {
+  Box,
+  Button,
+  Typography,
+  useTheme,
+  CircularProgress,
+} from '@mui/material';
 import io from 'socket.io-client';
 
 const socket = io('http://localhost:3000'); // Adjust the URL as necessary
 
 const Dashcam = () => {
-  const [isRecording, setIsRecording] = useState(true); // State to track if video is receiving
+  const [isRecording, setIsRecording] = useState(true);
+  const [isConnected, setIsConnected] = useState(false); // State to track WebSocket connection status
   const theme = useTheme();
   const videoRef = useRef(null);
 
   const startReceivingVideo = () => {
+    socket.on('connect', () => {
+      setIsConnected(true);
+    });
+
+    socket.on('disconnect', () => {
+      setIsConnected(false);
+    });
+
     socket.on('video-frame', (data) => {
       if (videoRef.current) {
         videoRef.current.src = `data:image/jpeg;base64,${data}`;
@@ -38,7 +53,7 @@ const Dashcam = () => {
   useEffect(() => {
     const startRecording = async () => {
       try {
-        console.log('Start')
+        console.log('Start');
         const response = await fetch('http://127.0.0.1:3000/start_recording', {
           method: 'POST',
           headers: {
@@ -86,18 +101,52 @@ const Dashcam = () => {
             backgroundColor: 'black',
             position: 'relative',
             overflow: 'hidden',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
+          {!isConnected && <CircularProgress size={80} color="primary" />}
           <img
             ref={videoRef}
             alt="Live Video Stream"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              display: isConnected ? 'block' : 'none',
+            }}
           />
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 20, // Adjust as needed
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 1000,
+            }}
+          >
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: isRecording ? 'red' : 'primary.main',
+                '&:hover': {
+                  backgroundColor: isRecording ? 'red' : 'primary.dark', // Keep red color when hovering
+                },
+              }}
+              onClick={handlePlayStop}
+            >
+              {isRecording ? 'Recording' : 'Not Recording'}
+            </Button>
+          </Box>
         </Box>
         <Box
           sx={{
             flex: 1,
-            backgroundColor: '#f0f0f0',
+            backgroundColor:
+              theme.palette.mode === 'dark'
+                ? theme.palette.primary[500]
+                : '#FFFFFF',
             padding: '10px',
             height: '100%',
           }}
@@ -107,20 +156,6 @@ const Dashcam = () => {
             Notifications will appear here
           </Typography>
         </Box>
-      </Box>
-      <Box
-        sx={{
-          backgroundColor:
-            theme.palette.mode === 'dark' ? '#1f1f1f' : '#f0f0f0',
-          padding: '20px',
-          display: 'flex',
-          width: '100%',
-          paddingLeft: '28vw' 
-        }}
-      >
-        <Button variant="contained" color="primary" onClick={handlePlayStop}>
-          {isRecording ? 'Stop' : 'Play'}
-        </Button>
       </Box>
     </Box>
   );

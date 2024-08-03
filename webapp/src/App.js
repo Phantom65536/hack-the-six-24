@@ -7,7 +7,7 @@ import Footage from './scenes/footage/Footage';
 import Login from './scenes/profile/Login';
 import Profile from './scenes/profile/Profile';
 import References from './scenes/static/References';
-import VideoPlayer from "./scenes/footage/VideoPlayer";
+import VideoPlayer from './scenes/footage/VideoPlayer';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { ColorModeContext, useMode } from './theme';
 
