@@ -8,6 +8,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from google.generativeai import GenerativeModel
 from flasgger import Swagger
+from pymongo import MongoClient
 
 app = Flask("backend_server")
 swagger = Swagger(app)
@@ -17,6 +18,9 @@ load_dotenv()
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 
 model = GenerativeModel("gemini-1.5-flash-001")
+
+db = MongoClient(os.getenv('MONGODB_URI')).get_database(os.getenv('DB_NAME'))
+drive_col = db.get_collection('driveRuns')
 
 @app.route('/api/upload', methods=['POST'])
 def upload_driving_summary():
@@ -180,10 +184,11 @@ def upload_driving_summary():
         "drowsiness_detected": drowsiness_detected,
         "summary": summary,
         "title": title,
-        "embedding": embedding
+        "embedding": embedding.tolist()
     }
 
     # TODO: push response to database
+    drive_col.insert_one(response)
 
     return jsonify(response), 200
 
@@ -245,6 +250,19 @@ def query_summary():
         return jsonify({"Error when embedding query": str(e)}), 500
 
     # TODO: do vector search to get relevant summary
+    result = drive_col.aggregate([
+        {
+            "$vectorSearch": {
+                "index": "vector_index",
+                "path": "embedding",
+                "queryVector": query_embedding,
+                "numCandidates": 2,
+                "limit": 2
+            }
+        }
+    ])
+
+    print(result[0].keys())
 
     fetched_summary = """
     The driver performed **room for improvement** in shoulder checks and **room for improvement** in drowsiness.

@@ -5,4 +5,6 @@ google-generativeai
 flask-restful
 flasgger
 
+pymongo
+
 opencv-python==4.10.0.84
