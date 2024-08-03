@@ -11,7 +11,7 @@ import io from 'socket.io-client';
 const socket = io('http://localhost:3000'); // Adjust the URL as necessary
 
 const Dashcam = () => {
-  const [isRecording, setIsRecording] = useState(true);
+  const [isRecording, setIsRecording] = useState(false);
   const [isConnected, setIsConnected] = useState(false); // State to track WebSocket connection status
   const theme = useTheme();
   const videoRef = useRef(null);

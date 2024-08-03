@@ -92,7 +92,7 @@ const Sidebar = () => {
             active={selected === 'Footage'}
             onClick={() => setSelected('Footage')}
           >
-            <Typography variant="body1">Previous Dashcam Footage</Typography>
+            <Typography variant="body1">Past Dashcam Footage</Typography>
             <Link to="/footage" />
           </MenuItem>
           <MenuItem

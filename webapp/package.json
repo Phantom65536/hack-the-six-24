@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@auth0/auth0-react": "^2.2.4",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@fullcalendar/core": "^6.1.15",
@@ -20,7 +21,10 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.7.3",
+    "dotenv": "^16.4.5",
     "formik": "^2.4.6",
+    "jwt-decode": "^4.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-pro-sidebar": "^0.7.1",
@@ -58,6 +62,7 @@
     "prettier": "^3.3.3",
     "sass": "^1.77.8",
     "sass-loader": "^16.0.0",
+    "stream-browserify": "^3.0.0",
     "webpack": "^5.93.0"
   }
 }
