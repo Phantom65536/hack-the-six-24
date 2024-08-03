@@ -187,10 +187,8 @@ def upload_driving_summary():
         "embedding": embedding
     }
 
-    print("Uploading to MongoDB")
-    # TODO: push response to database
     drive_col.insert_one(response)
-    print("Finsihed uploading to MongoDB")
+    response['_id'] = str(response['_id'])
 
     return jsonify(response), 200
 
