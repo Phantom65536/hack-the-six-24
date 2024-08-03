@@ -14,7 +14,6 @@ import VideoPlayer from './scenes/footage/VideoPlayer';
 import ProtectedRoute from './components/ProtectedRoute';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { ColorModeContext, useMode } from './theme';
-import { Dashboard } from '@mui/icons-material';
 
 function App() {
   const [theme, colorMode] = useMode();

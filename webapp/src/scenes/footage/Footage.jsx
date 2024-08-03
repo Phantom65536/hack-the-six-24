@@ -8,13 +8,18 @@ import {
   Card,
   CardContent,
   CardMedia,
+  Button,
 } from '@mui/material';
 import { colorTokens } from '../../theme';
 import SearchIcon from '@mui/icons-material/Search';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const Footage = () => {
+  const FLASK_URL = 'http://100.66.18.218:3001/api';
+  console.log(FLASK_URL);
+  
   const theme = useTheme();
   const colors = colorTokens(theme.palette.mode);
 
@@ -23,7 +28,7 @@ const Footage = () => {
 
   const fetchAllVideos = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:6000/api/get_all_videos');
+      const res = await axios.get(`${FLASK_URL}/getall`);
       setVideos(res.data);
     } catch (error) {
       console.error('Error fetching all videos:', error);
@@ -41,10 +46,11 @@ const Footage = () => {
     }
 
     try {
-      const res = await axios.post('http://127.0.0.1:6000/api/query', {
+      const res = await axios.post(`${FLASK_URL}/query`, {
         query: searchQuery,
       });
-      setVideos(res.data);
+      console.log(res.data);
+      setVideos([res.data]); // Assuming res.data is a single video object
     } catch (error) {
       console.error('Error fetching query:', error);
     }
@@ -80,28 +86,38 @@ const Footage = () => {
       {/* SEARCH RESULTS */}
       <Box mt={2} display="flex" flexWrap="wrap" gap={2}>
         {videos.map((video) => (
-          <Link
-            to={`/watch/${video.id}`}
-            key={video.id}
-            style={{ textDecoration: 'none' }}
-          >
-            <Card sx={{ maxWidth: 345, margin: '1em' }}>
-              <CardMedia
-                component="img"
-                alt={video.title}
-                height="140"
-                image={video.thumbnail}
-              />
-              <CardContent>
-                <Typography gutterBottom variant="h5" component="div">
-                  {video.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {video.description}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Link>
+          <Card key={video._id} sx={{ maxWidth: 345, margin: '1em' }}>
+            <CardMedia
+              component="img"
+              alt={video.title}
+              height="140"
+              image="https://via.placeholder.com/150" // Placeholder image, you can replace this with actual video thumbnail if available
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5" component="div">
+                {video.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {video.query}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {video.response}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {video.summary}
+              </Typography>
+              <Link to={`/watch/${video.video_file_name}`} style={{ textDecoration: 'none' }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<PlayArrowIcon />}
+                  sx={{ mt: 2 }}
+                >
+                  Play Video
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
         ))}
       </Box>
     </Box>
