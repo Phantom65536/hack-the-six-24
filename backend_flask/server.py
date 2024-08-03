@@ -261,20 +261,9 @@ def query_summary():
             }
         }
     ])
+    result = list(result)
 
-    print(result[0].keys())
-
-    fetched_summary = """
-    The driver performed **room for improvement** in shoulder checks and **room for improvement** in drowsiness.
-    
-    **Shoulder checks:** The driver only did 2 shoulder checks out of 3 turns, which is not enough. It's important to do a shoulder check before every turn, to make sure there are no vehicles or pedestrians coming. 
-    
-    **Suggestions for improvement:** The driver should make a conscious effort to do a shoulder check before every turn. It's also important to practice doing shoulder checks in a safe environment, such as a parking lot. 
-    
-    **Drowsiness:** The driver showed signs of drowsiness, which is very dangerous. Drowsiness can impair reaction time and make it difficult to stay focused on the road. 
-    
-    **Suggestions for improvement:** The driver should avoid driving when tired. It's important to get enough sleep before driving, and to take breaks if you start to feel drowsy. If you're feeling sleepy, pull over to a safe place and take a nap or get some coffee.
-    """
+    fetched_summary = result[0]['summary']
 
     question_answering_prompt = f"""
     You are a helpful and informative bot that answers questions using text from the reference driving summary included below. \
