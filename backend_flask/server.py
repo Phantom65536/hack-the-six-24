@@ -98,6 +98,7 @@ def upload_driving_summary():
     shoulder_check_done = data.get('shoulder_check_done')
     number_of_turns = data.get('number_of_turns')
     drowsiness_detected = data.get('drowsiness_detected')
+    video_public_url = data.get('video_public_url')
     print("Data received:")
     for key, value in data.items():
         if value is not None:
@@ -198,7 +199,8 @@ def upload_driving_summary():
         "summary": summary,
         "title": title,
         "embedding": embedding,
-        "gcs_file_name": gcs_file_name
+        "gcs_file_name": gcs_file_name,
+        "video_public_url": video_public_url
     }
 
     print("Inserting response to MongoDB")
@@ -331,4 +333,5 @@ def query_summary():
     return jsonify(response), 200
 
 if __name__ == '__main__':
-    app.run(host='localhost', debug=True, port=6000)
+    # app.run(host='localhost', debug=True, port=6000)
+    app.run(host='0.0.0.0', debug=False, port=3001)
