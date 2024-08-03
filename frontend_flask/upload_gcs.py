@@ -4,12 +4,10 @@ import time
 import requests
 from google.auth import default
 from google.auth.transport.requests import Request
-import google.generativeai as genai
 from dotenv import load_dotenv
 
 # Load the environment variables
 load_dotenv()
-genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 
 # Get the OAuth 2.0 token
 credentials, _ = default()
