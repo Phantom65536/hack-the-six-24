@@ -14,6 +14,7 @@ import VideoPlayer from './scenes/footage/VideoPlayer';
 import ProtectedRoute from './components/ProtectedRoute';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { ColorModeContext, useMode } from './theme';
+import { Dashboard } from '@mui/icons-material';
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -48,7 +49,7 @@ function App() {
           <main className="content">
             <Topbar setIsSidebar={setIsSidebar} />
             <Routes>
-              <Route path="/" element={<Welcome />} />
+              <Route path="/" element={(isAuthenticated ? <Dashcam /> : <Welcome />)} />
               <Route path="/dashboard" element={<Dashcam/>}></Route>
               <Route path="/footage" element={<Footage />} />
               <Route path="/references" element={<References />} />

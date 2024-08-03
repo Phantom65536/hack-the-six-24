@@ -40,13 +40,13 @@ const Topbar = () => {
     <Box display="flex" justifyContent="space-between" p={2}>
       {/* ICONS */}
       <Box display="flex">
-        <IconButton onClick={colorMode.toggleColorMode}>
+        {isAuthenticated && <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === 'dark' ? (
             <DarkModeOutlinedIcon fontSize="large" />
           ) : (
             <LightModeOutlinedIcon fontSize="large" />
           )}
-        </IconButton>
+        </IconButton>}
         <IconButton onClick={isAuthenticated ? () => logout({ returnTo: window.location.origin }) : loginWithRedirect}>
       {isAuthenticated ? <LogoutIcon fontSize="large" /> : <LoginIcon fontSize="large" />}
     </IconButton>
