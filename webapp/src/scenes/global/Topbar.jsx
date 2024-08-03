@@ -11,45 +11,52 @@ const Topbar = () => {
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
 
-  const { isAuthenticated, loginWithRedirect, logout, getAccessTokenSilently } = useAuth0();
+  const { isAuthenticated, loginWithRedirect, logout, getAccessTokenSilently } =
+    useAuth0();
 
   useEffect(() => {
-
     if (isAuthenticated) {
-
-      const getUserMetaData = async() => {
-
+      const getUserMetaData = async () => {
         const accessToken = await getAccessTokenSilently({
           authorizationParams: {
             audience: `${process.env.REACT_APP_AUTH0_AUDIENCE}`,
-            scope: "read: current_user"
-          }
-        })
+            scope: 'read: current_user',
+          },
+        });
 
         console.log(accessToken);
-
-      }
+      };
 
       getUserMetaData();
-
     }
-
-  }, [isAuthenticated])
+  }, [isAuthenticated]);
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
       {/* ICONS */}
       <Box display="flex">
-        {isAuthenticated && <IconButton onClick={colorMode.toggleColorMode}>
-          {theme.palette.mode === 'dark' ? (
-            <DarkModeOutlinedIcon fontSize="large" />
+        {isAuthenticated && (
+          <IconButton onClick={colorMode.toggleColorMode}>
+            {theme.palette.mode === 'dark' ? (
+              <DarkModeOutlinedIcon fontSize="large" />
+            ) : (
+              <LightModeOutlinedIcon fontSize="large" />
+            )}
+          </IconButton>
+        )}
+        <IconButton
+          onClick={
+            isAuthenticated
+              ? () => logout({ returnTo: window.location.origin })
+              : loginWithRedirect
+          }
+        >
+          {isAuthenticated ? (
+            <LogoutIcon fontSize="large" />
           ) : (
-            <LightModeOutlinedIcon fontSize="large" />
+            <LoginIcon fontSize="large" />
           )}
-        </IconButton>}
-        <IconButton onClick={isAuthenticated ? () => logout({ returnTo: window.location.origin }) : loginWithRedirect}>
-      {isAuthenticated ? <LogoutIcon fontSize="large" /> : <LoginIcon fontSize="large" />}
-    </IconButton>
+        </IconButton>
       </Box>
     </Box>
   );

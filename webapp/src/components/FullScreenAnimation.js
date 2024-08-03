@@ -10,12 +10,12 @@ const FullScreenAnimation = () => {
     autoplay: true,
     animationData: animationData,
     rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice'
-    }
+      preserveAspectRatio: 'xMidYMid slice',
+    },
   };
 
   return (
-    <Box 
+    <Box
       sx={{
         position: 'fixed',
         top: 0,
@@ -30,14 +30,14 @@ const FullScreenAnimation = () => {
         zIndex: -1,
       }}
     >
-      <Typography 
-        variant="h2" 
+      <Typography
+        variant="h2"
         sx={{
           position: 'absolute',
           top: '10%',
           color: '#FFFFFF',
           fontSize: '75px',
-          zIndex: 1 // Ensure the text is above the animation
+          zIndex: 1, // Ensure the text is above the animation
         }}
       >
         <TypeAnimation
@@ -48,7 +48,7 @@ const FullScreenAnimation = () => {
           repeat={1}
         />
       </Typography>
-      <Box 
+      <Box
         sx={{
           position: 'relative',
           width: '100%',

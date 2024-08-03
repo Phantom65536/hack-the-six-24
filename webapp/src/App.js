@@ -5,7 +5,7 @@ import { Routes, Route } from 'react-router-dom';
 import Topbar from './scenes/global/Topbar';
 import Sidebar from './scenes/global/Sidebar';
 import Dashcam from './scenes/dashboard/index';
-import Welcome from "./scenes/static/Welcome"
+import Welcome from './scenes/static/Welcome';
 import Footage from './scenes/footage/Footage';
 import Login from './scenes/profile/Login';
 import Profile from './scenes/profile/Profile';
@@ -49,8 +49,11 @@ function App() {
           <main className="content">
             <Topbar setIsSidebar={setIsSidebar} />
             <Routes>
-              <Route path="/" element={(isAuthenticated ? <Dashcam /> : <Welcome />)} />
-              <Route path="/dashboard" element={<Dashcam/>}></Route>
+              <Route
+                path="/"
+                element={isAuthenticated ? <Dashcam /> : <Welcome />}
+              />
+              <Route path="/dashboard" element={<Dashcam />}></Route>
               <Route path="/footage" element={<Footage />} />
               <Route path="/references" element={<References />} />
               <Route path="/login" element={<Login />} />

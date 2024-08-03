@@ -21,10 +21,10 @@ const Auth0ProviderWithHistory = ({ children }) => {
       clientId={clientId}
       authorizationParams={{
         redirect_uri: callback, // Adjusted to use underscore
-        audience: audience // Added audience parameter if needed
+        audience: audience, // Added audience parameter if needed
       }}
       onRedirectCallback={onRedirectCallback}
-      cacheLocation='localstorage'
+      cacheLocation="localstorage"
     >
       {children}
     </Auth0Provider>

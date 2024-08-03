@@ -1,12 +1,12 @@
-import React from 'react'
-import FullScreenAnimation from "../../components/FullScreenAnimation"
+import React from 'react';
+import FullScreenAnimation from '../../components/FullScreenAnimation';
 
 const Welcome = () => {
   return (
     <div>
-        <FullScreenAnimation />
+      <FullScreenAnimation />
     </div>
-  )
-}
+  );
+};
 
-export default Welcome
+export default Welcome;

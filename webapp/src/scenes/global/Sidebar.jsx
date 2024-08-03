@@ -86,10 +86,7 @@ const Sidebar = () => {
                 </>
               ) : (
                 <>
-                  <Avatar
-                    alt="Profile"
-                    sx={{ width: 150, height: 150, mb: 2 }}
-                  >
+                  <Avatar alt="Profile" sx={{ width: 150, height: 150, mb: 2 }}>
                     <PeopleIcon fontSize="large" />
                   </Avatar>
                   <Typography variant="h6" color={colours.grey[100]}>
