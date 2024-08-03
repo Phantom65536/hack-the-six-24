@@ -1,7 +1,8 @@
 from datetime import datetime
+from functools import wraps
 
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask import Flask, request, jsonify, g
+from flask_cors import CORS, cross_origin
 import time
 import os
 import google.generativeai as genai
@@ -12,6 +13,12 @@ from google.generativeai import GenerativeModel
 from google.cloud import storage
 from flasgger import Swagger
 from pymongo import MongoClient
+
+# from authlib.integrations.flask_client import OAuth
+import json
+from six.moves.urllib.request import urlopen
+from jose import jwt
+
 
 app = Flask("backend_server")
 swagger = Swagger(app)
@@ -24,6 +31,111 @@ model = GenerativeModel("gemini-1.5-flash-001")
 
 db = MongoClient(os.getenv('MONGODB_URI')).get_database(os.getenv('DB_NAME'))
 drive_col = db.get_collection('driveRuns')
+
+
+# --- Authentication ---
+class AuthError(Exception):
+    def __init__(self, error, status_code):
+        self.error = error
+        self.status_code = status_code
+
+@app.errorhandler(AuthError)
+def handle_auth_error(ex):
+    response = jsonify(ex.error)
+    response.status_code = ex.status_code
+    return response
+
+def get_token_auth_header():
+    """Obtains the Access Token from the Authorization Header
+    """
+    auth = request.headers.get("Authorization", None)
+    if not auth:
+        raise AuthError({
+            "code": "authorization_header_missing",
+            "description": "Authorization header is expected"
+        }, 401)
+
+    parts = auth.split()
+
+    if parts[0].lower() != "bearer":
+        raise AuthError({
+            "code": "invalid_header",
+            "description": "Authorization header must start with Bearer"
+        }, 401)
+    elif len(parts) == 1:
+        raise AuthError({
+            "code": "invalid_header",
+            "description": "Token not found"
+        }, 401)
+    elif len(parts) > 2:
+        raise AuthError({
+            "code": "invalid_header",
+            "description": "Authorization header must be Bearer token"
+        }, 401)
+
+    return parts[1]
+
+def requires_auth(f):
+    """Determines if the Access Token is valid
+    """
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = get_token_auth_header()
+        jsonurl = urlopen(f"https://{os.getenv('AUTH0_DOMAIN')}/.well-known/jwks.json")
+        jwks = json.loads(jsonurl.read())
+        unverified_header = jwt.get_unverified_header(token)
+        rsa_key = {}
+        for key in jwks["keys"]:
+            if key["kid"] == unverified_header["kid"]:
+                rsa_key = {
+                    "kty": key["kty"],
+                    "kid": key["kid"],
+                    "use": key["use"],
+                    "n": key["n"],
+                    "e": key["e"]
+                }
+        if rsa_key:
+            try:
+                payload = jwt.decode(
+                    token,
+                    rsa_key,
+                    algorithms=['RS256'],
+                    audience=os.getenv('AUTH0_API_AUDIENCE'),
+                    issuer=f"https://{os.getenv('AUTH0_DOMAIN')}/"
+                )
+            except jwt.ExpiredSignatureError:
+                raise AuthError({
+                    "code": "token_expired",
+                    "description": "token is expired"
+                }, 401)
+            except jwt.JWTClaimsError:
+                raise AuthError({
+                    "code": "invalid_claims",
+                    "description": "incorrect claims, please check the audience and issuer"
+                }, 401)
+            except Exception:
+                raise AuthError({
+                    "code": "invalid_header",
+                    "description": "Unable to parse authentication token."
+                }, 401)
+
+            g.current_user = payload
+            return f(*args, **kwargs)
+
+        raise AuthError({
+            "code": "invalid_header",
+            "description": "Unable to find appropriate key"
+        }, 401)
+    return decorated
+
+@app.route('/api/auth_test')
+@cross_origin(headers=["Content-Type", "Authorization"])
+@requires_auth
+def testing():
+    return jsonify(message="Auth success"), 200
+
+# ----------------------
+
 
 @app.route('/api/upload', methods=['POST'])
 def upload_driving_summary():
@@ -335,3 +447,37 @@ def query_summary():
 if __name__ == '__main__':
     # app.run(host='localhost', debug=True, port=6000)
     app.run(host='0.0.0.0', debug=False, port=3001)
+
+# '''
+# {
+#   "sub": "auth0|66ae546372c2afb06a03107c",
+#   "nickname": "abc",
+#   "name": "abc@gmail.com",
+#   "picture": "https://s.gravatar.com/avatar/3f009d72559f51e7e454b16e5d0687a1?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fab.png",
+#   "updated_at": "2024-08-03T16:01:56.701Z"
+# }
+# '''
+
+# # Auth0 Authentication setup
+# oauth = OAuth(app)
+# oauth.register(
+#     'auth0',
+#     client_id=os.getenv('AUTH0_CLIENT_ID'),
+#     client_secret=os.getenv('AUTH0_CLIENT_SECRET'),
+#     client_kwargs={ 'scope': 'opendid profile email' },
+#     server_metadata_url=f'https://{os.getenv('AUTH0_DOMAIN')}/.well-known/openid-configuration'
+# )
+
+# def requires_auth(f):
+#     @wraps(f)
+#     def auth(*args, **kwargs):
+#         token = request.headers.get('Authorization', None)
+        
+#         if not token:
+#             return jsonify({ 'error': 'auth token missing' }), 401
+        
+#         try:
+#             payload = jwt
+#         return f(*args, **kwargs)
+    
+#     return auth
