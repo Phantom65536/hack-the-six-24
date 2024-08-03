@@ -129,7 +129,7 @@ const Dashcam = () => {
             <Button
               variant="contained"
               sx={{
-                backgroundColor: isRecording ? 'red' : 'primary.main',
+                backgroundColor: isRecording ? 'red' : 'primary.light',
                 '&:hover': {
                   backgroundColor: isRecording ? 'red' : 'primary.dark', // Keep red color when hovering
                 },
