@@ -1,4 +1,3 @@
-// src/Dashcam.js
 import React, { useRef, useEffect, useState } from 'react';
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import io from 'socket.io-client';
@@ -6,20 +5,9 @@ import io from 'socket.io-client';
 const socket = io('http://localhost:3000'); // Adjust the URL as necessary
 
 const Dashcam = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isRecording, setIsRecording] = useState(true); // State to track if video is receiving
   const theme = useTheme();
   const videoRef = useRef(null);
-
-  const handlePlayStop = () => {
-    setIsPlaying(!isPlaying);
-    if (videoRef.current) {
-      if (!isPlaying) {
-        startReceivingVideo();
-      } else {
-        stopReceivingVideo();
-      }
-    }
-  };
 
   const startReceivingVideo = () => {
     socket.on('video-frame', (data) => {
@@ -37,10 +25,57 @@ const Dashcam = () => {
   };
 
   useEffect(() => {
+    startReceivingVideo();
     return () => {
       stopReceivingVideo(); // Stop receiving video on component unmount
     };
   }, []);
+
+  const handlePlayStop = () => {
+    setIsRecording(!isRecording);
+  };
+
+  useEffect(() => {
+    const startRecording = async () => {
+      try {
+        console.log('Start')
+        const response = await fetch('http://127.0.0.1:3000/start_recording', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Failed to start recording');
+        }
+      } catch (error) {
+        console.error('Error starting recording:', error);
+      }
+    };
+
+    const stopRecording = async () => {
+      try {
+        console.log('Stop');
+        const response = await fetch('http://127.0.0.1:3000/stop_recording', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Failed to stop recording');
+        }
+      } catch (error) {
+        console.error('Error stopping recording:', error);
+      }
+    };
+
+    if (isRecording) {
+      startRecording();
+    } else {
+      stopRecording();
+    }
+  }, [isRecording]);
 
   return (
     <Box sx={{ height: '90vh', display: 'flex', flexDirection: 'column' }}>
@@ -80,11 +115,11 @@ const Dashcam = () => {
           padding: '20px',
           display: 'flex',
           width: '100%',
-          paddingLeft: '28vw',
+          paddingLeft: '28vw' 
         }}
       >
         <Button variant="contained" color="primary" onClick={handlePlayStop}>
-          {isPlaying ? 'Stop' : 'Play'}
+          {isRecording ? 'Stop' : 'Play'}
         </Button>
       </Box>
     </Box>

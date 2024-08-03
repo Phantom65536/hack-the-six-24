@@ -7,6 +7,7 @@ import Footage from './scenes/footage/Footage';
 import Login from './scenes/profile/Login';
 import Profile from './scenes/profile/Profile';
 import References from './scenes/static/References';
+import VideoPlayer from "./scenes/footage/VideoPlayer";
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { ColorModeContext, useMode } from './theme';
 
@@ -28,6 +29,7 @@ function App() {
               <Route path="/references" element={<References />} />
               <Route path="/login" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/watch/:id" element={<VideoPlayer />} />
             </Routes>
           </main>
         </div>
