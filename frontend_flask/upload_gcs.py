@@ -61,16 +61,15 @@ if video_file.state.name == "FAILED":
 gemini_file_id = video_file.name
 
 # Open the file and make the POST request
-with open(object_location, 'rb') as file:
-    response = requests.post(
-        f'http://localhost:6000/api/upload',
-        headers={"Content-Type": "application/json"},
-        json={
-            "video_file_name": gemini_file_id,
-            "gcs_file_name": gcs_file_id,
-            "shoulder_check_done" : 2,
-            "number_of_turns": 3,
-            "drowsiness_detected" : 1
+response = requests.post(
+    f'http://localhost:6000/api/upload',
+    headers={"Content-Type": "application/json"},
+    json={
+        "video_file_name": gemini_file_id,
+        "gcs_file_name": gcs_file_id,
+        "shoulder_check_done" : 2,
+        "number_of_turns": 3,
+        "drowsiness_detected" : 1
 }
 )
 
