@@ -20,13 +20,13 @@ const Topbar = () => {
       <Box display="flex">
         <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === 'dark' ? (
-            <DarkModeOutlinedIcon />
+            <DarkModeOutlinedIcon fontSize="large" />
           ) : (
-            <LightModeOutlinedIcon />
+            <LightModeOutlinedIcon fontSize="large" />
           )}
         </IconButton>
         <IconButton>
-          <PersonOutlinedIcon />
+          <PersonOutlinedIcon fontSize="large" />
         </IconButton>
       </Box>
     </Box>

@@ -4,7 +4,6 @@ import { Box, IconButton, Typography, useTheme, Avatar } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { tokens } from '../../theme';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import ContactsOutlinedIcon from '@mui/icons-material/ContactsOutlined';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import VideoCameraFrontOutlinedIcon from '@mui/icons-material/VideoCameraFrontOutlined';
@@ -21,12 +20,16 @@ const Sidebar = () => {
       sx={{
         '& .pro-sidebar-inner': {
           background: `${colours.primary[400]} !important`,
+          width: isCollapsed ? '80px' : '250px', // Adjusted width
+          transition: 'width 0.2s ease-in-out',
         },
         '& .pro-icon-wrapper': {
-          backgroundColor: `transparent !important `,
+          backgroundColor: 'transparent !important',
+          display: 'flex',
+          justifyContent: 'center',
         },
         '& .pro-inner-item': {
-          padding: '5px 35px 5px 20px !important',
+          padding: '10px 35px 10px 20px !important', // Increased padding
         },
         '& .pro-inner-item:hover': {
           color: '#868dfb !important',
@@ -77,27 +80,27 @@ const Sidebar = () => {
             </Box>
           )}
           <MenuItem
-            icon={<HomeOutlinedIcon />}
+            icon={<HomeOutlinedIcon fontSize="large" />} // Increased icon size
             active={selected === 'Dashboard'}
             onClick={() => setSelected('Dashboard')}
           >
-            <Typography>Dashcam</Typography>
+            <Typography variant="body1">Dashcam</Typography>
             <Link to="/" />
           </MenuItem>
           <MenuItem
-            icon={<VideoCameraFrontOutlinedIcon />}
+            icon={<VideoCameraFrontOutlinedIcon fontSize="large" />} // Increased icon size
             active={selected === 'Footage'}
             onClick={() => setSelected('Footage')}
           >
-            <Typography>Previous Dashcam Footage</Typography>
+            <Typography variant="body1">Previous Dashcam Footage</Typography>
             <Link to="/footage" />
           </MenuItem>
           <MenuItem
-            icon={<BookOutlinedIcon />}
+            icon={<BookOutlinedIcon fontSize="large" />} // Increased icon size
             active={selected === 'References'}
             onClick={() => setSelected('References')}
           >
-            <Typography>References</Typography>
+            <Typography variant="body1">References</Typography>
             <Link to="/references" />
           </MenuItem>
         </Menu>
