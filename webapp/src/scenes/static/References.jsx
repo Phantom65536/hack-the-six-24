@@ -22,11 +22,16 @@ const references = [
       'https://www.youtube.com/watch?v=xAHChyquEG8 - Used to gather data from Gyroscope in mobile device.',
   },
   {
+    title: 'Luca Nagy Lottiefiles Animated Car',
+    description:
+      'https://lottiefiles.com/free-animation/car-isometric-3d-animation-navigation-car-red-car-in-nature-car-on-the-road-UmX9w6OIN4 - Used for the animated welcome page.',
+  },
+  {
     title: 'ChatGPT',
     description:
       'https://chatgpt.com - for general help and inquiries about code.',
   },
-  // Add more references as needed
+  
 ];
 
 const References = () => {
