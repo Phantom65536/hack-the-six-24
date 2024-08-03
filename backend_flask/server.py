@@ -184,11 +184,13 @@ def upload_driving_summary():
         "drowsiness_detected": drowsiness_detected,
         "summary": summary,
         "title": title,
-        "embedding": embedding.tolist()
+        "embedding": embedding
     }
 
+    print("Uploading to MongoDB")
     # TODO: push response to database
     drive_col.insert_one(response)
+    print("Finsihed uploading to MongoDB")
 
     return jsonify(response), 200
 
