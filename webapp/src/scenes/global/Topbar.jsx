@@ -1,18 +1,40 @@
 import { Box, IconButton, useTheme } from '@mui/material';
-import { useContext } from 'react';
-import { ColorModeContext, tokens } from '../../theme';
-import InputBase from '@mui/material/InputBase';
+import { useContext, useEffect } from 'react';
+import { ColorModeContext } from '../../theme';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
-import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-import SearchIcon from '@mui/icons-material/Search';
+import { useAuth0 } from '@auth0/auth0-react';
+import LogoutIcon from '@mui/icons-material/Logout';
+import LoginIcon from '@mui/icons-material/Login';
 
 const Topbar = () => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
+
+  const { isAuthenticated, loginWithRedirect, logout, getAccessTokenSilently } = useAuth0();
+
+  useEffect(() => {
+
+    if (isAuthenticated) {
+
+      const getUserMetaData = async() => {
+
+        const accessToken = await getAccessTokenSilently({
+          authorizationParams: {
+            audience: `${process.env.REACT_APP_AUTH0_AUDIENCE}`,
+            scope: "read: current_user"
+          }
+        })
+
+        console.log(accessToken);
+
+      }
+
+      getUserMetaData();
+
+    }
+
+  }, [isAuthenticated])
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
@@ -25,9 +47,9 @@ const Topbar = () => {
             <LightModeOutlinedIcon fontSize="large" />
           )}
         </IconButton>
-        <IconButton>
-          <PersonOutlinedIcon fontSize="large" />
-        </IconButton>
+        <IconButton onClick={isAuthenticated ? () => logout({ returnTo: window.location.origin }) : loginWithRedirect}>
+      {isAuthenticated ? <LogoutIcon fontSize="large" /> : <LoginIcon fontSize="large" />}
+    </IconButton>
       </Box>
     </Box>
   );

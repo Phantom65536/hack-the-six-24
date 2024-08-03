@@ -2,18 +2,22 @@ import { useState } from 'react';
 import { ProSidebar, Menu, MenuItem } from 'react-pro-sidebar';
 import { Box, IconButton, Typography, useTheme, Avatar } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { tokens } from '../../theme';
+import { colorTokens } from '../../theme';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import VideoCameraFrontOutlinedIcon from '@mui/icons-material/VideoCameraFrontOutlined';
 import 'react-pro-sidebar/dist/css/styles.css';
+import PeopleIcon from '@mui/icons-material/People';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const Sidebar = () => {
   const theme = useTheme();
-  const colours = tokens(theme.palette.mode);
+  const colours = colorTokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState('Dashboard');
+
+  const { isAuthenticated, user } = useAuth0();
 
   return (
     <Box
@@ -66,17 +70,36 @@ const Sidebar = () => {
               alignItems="center"
               mb="25px"
             >
-              <Avatar
-                src="https://via.placeholder.com/150"
-                alt="Profile"
-                sx={{ width: 150, height: 150, mb: 2 }}
-              />
-              <Typography variant="h6" color={colours.grey[100]}>
-                John Doe
-              </Typography>
-              <Typography variant="body2" color={colours.grey[300]}>
-                johndoe@example.com
-              </Typography>
+              {isAuthenticated ? (
+                <>
+                  <Avatar
+                    alt={user.name}
+                    src={user.picture}
+                    sx={{ width: 150, height: 150, mb: 2 }}
+                  />
+                  <Typography variant="h6" color={colours.grey[100]}>
+                    {user.name}
+                  </Typography>
+                  <Typography variant="body2" color={colours.grey[300]}>
+                    {user.email}
+                  </Typography>
+                </>
+              ) : (
+                <>
+                  <Avatar
+                    alt="Profile"
+                    sx={{ width: 150, height: 150, mb: 2 }}
+                  >
+                    <PeopleIcon fontSize="large" />
+                  </Avatar>
+                  <Typography variant="h6" color={colours.grey[100]}>
+                    John Doe
+                  </Typography>
+                  <Typography variant="body2" color={colours.grey[300]}>
+                    johndoe@example.com
+                  </Typography>
+                </>
+              )}
             </Box>
           )}
           <MenuItem

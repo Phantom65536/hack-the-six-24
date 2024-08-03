@@ -9,14 +9,14 @@ import {
   CardContent,
   CardMedia,
 } from '@mui/material';
-import { tokens } from '../../theme';
+import { colorTokens } from '../../theme';
 import SearchIcon from '@mui/icons-material/Search';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const Footage = () => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+  const colors = colorTokens(theme.palette.mode);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [videos, setVideos] = useState([]);
