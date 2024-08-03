@@ -1,23 +1,52 @@
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, SafeAreaView, Switch } from 'react-native';
-import React, { useState, useEffect } from 'react';
 import { Gyroscope } from 'expo-sensors';
+import io from 'socket.io-client';
+
+// ip: 100.67.89.206
+const SOCKET_SERVER_URL = 'http://100.67.89.206:4000';
 
 const { width, height } = Dimensions.get('window');
 
 const GyroTest = () => {
   const [gyroData, setGyroData] = useState({ x: 0, y: 0, z: 0 });
   const [gyroEnabled, setGyroEnabled] = useState(false);
+  const [previousGyroYData, setPreviousGyroYData] = useState(0);
   const [controlledDotPosition, setControlledDotPosition] = useState({
     x: width / 2 - 25,
     y: height / 2 - 25,
   });
+
+  const socket = useRef(null);
+
+  useEffect(() => {
+    // Establish socket connection once
+    if (!socket.current) {
+      socket.current = io(SOCKET_SERVER_URL);
+
+      socket.current.on('connect', () => {
+        console.log('Client connected');
+      });
+
+      socket.current.on('disconnect', () => {
+        console.log('Client disconnected');
+      });
+    }
+
+    return () => {
+      // Clean up the socket connection when the component unmounts
+      if (socket.current) {
+        socket.current.disconnect();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     let subscription;
 
     if (gyroEnabled) {
       subscription = Gyroscope.addListener((gyroscopeData) => {
-        console.log(gyroscopeData);
+        console.log([previousGyroYData, gyroscopeData.y]);
 
         setGyroData(gyroscopeData);
 
@@ -25,6 +54,17 @@ const GyroTest = () => {
           x: prevPosition.x - gyroscopeData.y * 4,
           y: prevPosition.y - gyroscopeData.x * 4,
         }));
+
+        // Send gyroscope data to the Node.js server
+        // [Float last value, float current value] - Y Values.
+        if (socket.current && socket.current.connected) {
+          const socketData = [previousGyroYData, gyroscopeData.y];
+          console.log('Sending data to server:', socketData);
+          socket.current.emit('gyroscopeData', JSON.stringify(socketData));
+        }
+
+        // Update the previousGyroYData state with the current y value
+        setPreviousGyroYData(gyroscopeData.y);
       });
 
       Gyroscope.setUpdateInterval(100); // Adjust the update interval if needed
@@ -35,7 +75,7 @@ const GyroTest = () => {
     return () => {
       subscription?.remove();
     };
-  }, [gyroEnabled]);
+  }, [gyroEnabled, previousGyroYData]);
 
   const handleGyroToggle = () => {
     setGyroEnabled(!gyroEnabled);
@@ -48,7 +88,7 @@ const GyroTest = () => {
         <Switch
           trackColor={{ false: '#767577', true: '#81b0ff' }}
           thumbColor={gyroEnabled ? '#f5dd4b' : '#f4f3f4'}
-          ios_backgroundColor={'#3e3e3e'}
+          ios_backgroundColor="#3e3e3e"
           onValueChange={handleGyroToggle}
           value={gyroEnabled}
           style={styles.switch}
