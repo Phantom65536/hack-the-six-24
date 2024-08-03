@@ -205,7 +205,7 @@ def get_all_summaries():
         200:
             description: A JSON response with all the summaries
         500:
-            description: Gemini API error
+            description: MongoDB error
     """
     print("GETTNG ALLLLL")
     print(os.getenv('MONGODB_URI'))
@@ -284,8 +284,10 @@ def query_summary():
         }
     ])
     result = list(result)
-
-    fetched_summary = result[0]['summary']
+    print(result)
+    top_result = result[0]
+    top_result['_id'] = str(top_result['_id'])
+    fetched_summary = top_result['summary']
 
     question_answering_prompt = f"""
     You are a helpful and informative bot that answers questions using text from the reference driving summary included below. \
@@ -309,11 +311,10 @@ def query_summary():
         return jsonify({"Error when generating answer from fetched summary": str(e)}), 500
 
 
-    response = {
+    response = top_result | {
         "timestamp": datetime.now().isoformat(),
         "query": query,
         "query_embedding": query_embedding,
-        "fetched_summary": fetched_summary,
         "response": answer
     }
     return jsonify(response), 200
