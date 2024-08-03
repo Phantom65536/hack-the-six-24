@@ -1,35 +1,43 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  SafeAreaView,
-  Switch,
-} from "react-native";
-import React, { useState, useEffect, useRef } from "react";
-import { Gyroscope } from "expo-sensors";
-import io from "socket.io-client";
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Dimensions, SafeAreaView, Switch } from 'react-native';
+import { Gyroscope } from 'expo-sensors';
+import io from 'socket.io-client';
 
-const SOCKET_SERVER_URL = "http://your-socket-io-server-url";
+// ip: 100.67.89.206
+const SOCKET_SERVER_URL = 'http://100.67.89.206:4000';
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
 
 const GyroTest = () => {
   const [gyroData, setGyroData] = useState({ x: 0, y: 0, z: 0 });
   const [gyroEnabled, setGyroEnabled] = useState(false);
+  const [previousGyroYData, setPreviousGyroYData] = useState(0);
   const [controlledDotPosition, setControlledDotPosition] = useState({
-    x: width / 2 - 25, // Centering the controlled dot initially
+    x: width / 2 - 25,
     y: height / 2 - 25,
   });
 
-  const socketRef = useRef();
+  const socket = useRef(null);
 
-  // Set up Socket.IO connection
   useEffect(() => {
-    socketRef.current = io(SOCKET_SERVER_URL);
+    // Establish socket connection once
+    if (!socket.current) {
+      socket.current = io(SOCKET_SERVER_URL);
+
+      socket.current.on('connect', () => {
+        console.log('Client connected');
+      });
+
+      socket.current.on('disconnect', () => {
+        console.log('Client disconnected');
+      });
+    }
 
     return () => {
-      socketRef.current.disconnect();
+      // Clean up the socket connection when the component unmounts
+      if (socket.current) {
+        socket.current.disconnect();
+      }
     };
   }, []);
 
@@ -38,7 +46,7 @@ const GyroTest = () => {
 
     if (gyroEnabled) {
       subscription = Gyroscope.addListener((gyroscopeData) => {
-        console.log(gyroscopeData);
+        console.log([previousGyroYData, gyroscopeData.y]);
 
         setGyroData(gyroscopeData);
 
@@ -46,6 +54,17 @@ const GyroTest = () => {
           x: prevPosition.x - gyroscopeData.y * 4,
           y: prevPosition.y - gyroscopeData.x * 4,
         }));
+
+        // Send gyroscope data to the Node.js server
+        // [Float last value, float current value] - Y Values.
+        if (socket.current && socket.current.connected) {
+          const socketData = [previousGyroYData, gyroscopeData.y];
+          console.log('Sending data to server:', socketData);
+          socket.current.emit('gyroscopeData', JSON.stringify(socketData));
+        }
+
+        // Update the previousGyroYData state with the current y value
+        setPreviousGyroYData(gyroscopeData.y);
       });
 
       Gyroscope.setUpdateInterval(100); // Adjust the update interval if needed
@@ -56,32 +75,19 @@ const GyroTest = () => {
     return () => {
       subscription?.remove();
     };
-  }, [gyroEnabled]);
+  }, [gyroEnabled, previousGyroYData]);
 
   const handleGyroToggle = () => {
     setGyroEnabled(!gyroEnabled);
   };
-
-  // Send gyroscope data to the server every second
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (gyroEnabled) {
-        socketRef.current.emit("gyroscopeData", gyroData);
-      }
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [gyroEnabled, gyroData]);
 
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Gyroscope-2</Text>
       <View style={styles.switchContainer}>
         <Switch
-          trackColor={{ false: "#767577", true: "#81b0ff" }}
-          thumbColor={gyroEnabled ? "#f5dd4b" : "#f4f3f4"}
+          trackColor={{ false: '#767577', true: '#81b0ff' }}
+          thumbColor={gyroEnabled ? '#f5dd4b' : '#f4f3f4'}
           ios_backgroundColor="#3e3e3e"
           onValueChange={handleGyroToggle}
           value={gyroEnabled}
@@ -92,10 +98,7 @@ const GyroTest = () => {
       <View
         style={{
           ...styles.controlledDot,
-          transform: [
-            { translateX: controlledDotPosition.x },
-            { translateY: controlledDotPosition.y },
-          ],
+          transform: [{ translateX: controlledDotPosition.x }, { translateY: controlledDotPosition.y }],
         }}
       />
     </SafeAreaView>
@@ -107,12 +110,12 @@ export default GyroTest;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
+    backgroundColor: '#fff',
+    alignItems: 'center',
   },
   title: {
     fontSize: 40,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginTop: 80,
   },
   switchContainer: {
@@ -126,8 +129,8 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: "red",
-    position: "absolute",
+    backgroundColor: 'red',
+    position: 'absolute',
     top: height / 2 - 30,
     left: width / 2 - 30,
   },
@@ -135,7 +138,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "red",
-    position: "absolute",
+    backgroundColor: 'blue',
+    position: 'absolute',
   },
 });
