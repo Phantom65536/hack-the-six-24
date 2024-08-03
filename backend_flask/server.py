@@ -6,7 +6,10 @@ import time
 import os
 import google.generativeai as genai
 from dotenv import load_dotenv
+from google.auth import default
+from google.auth.transport.requests import Request
 from google.generativeai import GenerativeModel
+from google.cloud import storage
 from flasgger import Swagger
 from pymongo import MongoClient
 
@@ -91,7 +94,6 @@ def upload_driving_summary():
         return jsonify({"error": "No data provided"}), 400
 
     # Extracting data from the JSON payload
-    video_file_name = data.get('video_file_name')
     gcs_file_name = data.get('gcs_file_name')
     shoulder_check_done = data.get('shoulder_check_done')
     number_of_turns = data.get('number_of_turns')
@@ -103,6 +105,29 @@ def upload_driving_summary():
         else:
             print(f"{key}: Not provided")
             return jsonify({"error": f"Missing data for {key}"}), 400
+
+    # The ID of your GCS bucket
+    bucket_name = 'hackthe6ix'
+    local_video_path = './google_video.mp4'
+    storage_client = storage.Client(project=os.getenv('GOOGLE_CLOUD_PROJECT'))
+    bucket = storage_client.bucket(bucket_name)
+
+    blob = bucket.blob(gcs_file_name)
+    blob.download_to_filename(local_video_path)
+
+    video_file = genai.upload_file(path=local_video_path)
+    print(video_file.name)
+    print(f"Completed upload: {video_file.uri}")
+
+    while video_file.state.name == "PROCESSING":
+        print('.', end='')
+        time.sleep(2)
+        video_file = genai.get_file(video_file.name)
+
+    if video_file.state.name == "FAILED":
+        raise ValueError(video_file.state.name)
+
+    video_file_name = video_file.name
 
     # Check whether the file is ready to be used.
     try:
