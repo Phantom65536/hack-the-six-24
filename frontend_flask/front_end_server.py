@@ -2,18 +2,20 @@ from flask import Flask, request, jsonify, render_template, Response
 from flask_cors import CORS
 import time
 import os
-import google.generativeai as genai
 from dotenv import load_dotenv
-from flasgger import Swagger
+
+print("Importing camera")
 
 from camera import VideoCamera
 
+print("Starting frontend server")
+
 app = Flask("frontend_server")
-swagger = Swagger(app)
 CORS(app)
 
 load_dotenv()
-genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
+
+print("Starting camera")
 
 video_camera = VideoCamera()
 
@@ -53,29 +55,12 @@ def end_recording():
         response = video_camera.end_recording()
         if "error" in response:
             return jsonify(response), 400
-        gemini_file_name = upload_recording_gemini(response["file_name"])
+        # gemini_file_name = upload_recording_gemini(response["file_name"])
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
-    return jsonify({
-        "file_name": response["file_name"],
-        "gemini_file_name": gemini_file_name
-    })
+    return jsonify(response)
 
-def upload_recording_gemini(file_name):
-    video_file = genai.upload_file(path=file_name)
-    print(video_file.name)
-    print(f"Completed upload: {video_file.uri}")
-
-    while video_file.state.name == "PROCESSING":
-        print('.', end='')
-        time.sleep(2)
-        video_file = genai.get_file(video_file.name)
-
-    if video_file.state.name == "FAILED":
-        raise ValueError(video_file.state.name)
-
-    return video_file.name
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=3000, threaded=True, use_reloader=False, debug=True)
+    app.run(host='0.0.0.0', port=9000, threaded=True, use_reloader=False, debug=True) #100.67.76.199
