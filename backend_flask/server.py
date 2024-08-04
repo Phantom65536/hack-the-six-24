@@ -91,6 +91,7 @@ def upload_driving_summary():
     """
     # Get JSON data from the request
     data = request.get_json()
+    print(data)
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
@@ -335,4 +336,4 @@ def query_summary():
 
 if __name__ == '__main__':
     # app.run(host='localhost', debug=True, port=6000)
-    app.run(host='0.0.0.0', debug=False, port=3001)
+    app.run(host='0.0.0.0', debug=True, port=3001)
