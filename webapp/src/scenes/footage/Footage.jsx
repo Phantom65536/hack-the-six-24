@@ -17,7 +17,8 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const Footage = () => {
-  const FLASK_URL = 'http://100.66.18.218:3001/api';
+  // const FLASK_URL = 'http://100.66.18.218:3001/api';
+  const FLASK_URL = 'http://100.66.21.135:3001/api'
   console.log(FLASK_URL);
   
   const theme = useTheme();
@@ -85,13 +86,13 @@ const Footage = () => {
 
       {/* SEARCH RESULTS */}
       <Box mt={2} display="flex" flexWrap="wrap" gap={2}>
-        {videos.map((video) => (
+        {videos.map((video, i) => (
           <Card key={video._id} sx={{ maxWidth: 345, margin: '1em' }}>
             <CardMedia
               component="img"
               alt={video.title}
               height="140"
-              image="https://via.placeholder.com/150" // Placeholder image, you can replace this with actual video thumbnail if available
+              image={require(`../../../public/temp${i%3 + 1}.png`)} // Placeholder image, you can replace this with actual video thumbnail if available
             />
             <CardContent>
               <Typography gutterBottom variant="h5" component="div">
