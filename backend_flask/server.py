@@ -6,7 +6,10 @@ import time
 import os
 import google.generativeai as genai
 from dotenv import load_dotenv
+from google.auth import default
+from google.auth.transport.requests import Request
 from google.generativeai import GenerativeModel
+from google.cloud import storage
 from flasgger import Swagger
 from pymongo import MongoClient
 
@@ -91,11 +94,11 @@ def upload_driving_summary():
         return jsonify({"error": "No data provided"}), 400
 
     # Extracting data from the JSON payload
-    video_file_name = data.get('video_file_name')
     gcs_file_name = data.get('gcs_file_name')
     shoulder_check_done = data.get('shoulder_check_done')
     number_of_turns = data.get('number_of_turns')
     drowsiness_detected = data.get('drowsiness_detected')
+    video_public_url = data.get('video_public_url')
     print("Data received:")
     for key, value in data.items():
         if value is not None:
@@ -104,19 +107,28 @@ def upload_driving_summary():
             print(f"{key}: Not provided")
             return jsonify({"error": f"Missing data for {key}"}), 400
 
-    # Check whether the file is ready to be used.
-    try:
-        video_file = None
-        while video_file is None or video_file.state.name == "PROCESSING":
-            print('.', end='')
-            time.sleep(2)
-            video_file = genai.get_file(video_file_name)
+    # The ID of your GCS bucket
+    bucket_name = 'hackthe6ix'
+    local_video_path = './google_video.mp4'
+    storage_client = storage.Client(project=os.getenv('GOOGLE_CLOUD_PROJECT'))
+    bucket = storage_client.bucket(bucket_name)
 
-        if video_file.state.name == "FAILED":
-          raise ValueError(video_file.state.name)
-        print(f"Completed upload: {video_file.uri}")
-    except Exception as e:
-        return jsonify({"Error when retrieving video file": str(e)}), 500
+    blob = bucket.blob(gcs_file_name)
+    blob.download_to_filename(local_video_path)
+
+    video_file = genai.upload_file(path=local_video_path)
+    print(video_file.name)
+    print(f"Completed upload: {video_file.uri}")
+
+    while video_file.state.name == "PROCESSING":
+        print('.', end='')
+        time.sleep(2)
+        video_file = genai.get_file(video_file.name)
+
+    if video_file.state.name == "FAILED":
+        raise ValueError(video_file.state.name)
+
+    video_file_name = video_file.name
 
     # List all files
     for file in genai.list_files():
@@ -187,7 +199,8 @@ def upload_driving_summary():
         "summary": summary,
         "title": title,
         "embedding": embedding,
-        "gcs_file_name": gcs_file_name
+        "gcs_file_name": gcs_file_name,
+        "video_public_url": video_public_url
     }
 
     print("Inserting response to MongoDB")
@@ -205,7 +218,7 @@ def get_all_summaries():
         200:
             description: A JSON response with all the summaries
         500:
-            description: Gemini API error
+            description: MongoDB error
     """
     print("GETTNG ALLLLL")
     print(os.getenv('MONGODB_URI'))
@@ -284,8 +297,10 @@ def query_summary():
         }
     ])
     result = list(result)
-
-    fetched_summary = result[0]['summary']
+    print(result)
+    top_result = result[0]
+    top_result['_id'] = str(top_result['_id'])
+    fetched_summary = top_result['summary']
 
     question_answering_prompt = f"""
     You are a helpful and informative bot that answers questions using text from the reference driving summary included below. \
@@ -309,14 +324,14 @@ def query_summary():
         return jsonify({"Error when generating answer from fetched summary": str(e)}), 500
 
 
-    response = {
+    response = top_result | {
         "timestamp": datetime.now().isoformat(),
         "query": query,
         "query_embedding": query_embedding,
-        "fetched_summary": fetched_summary,
         "response": answer
     }
     return jsonify(response), 200
 
 if __name__ == '__main__':
-    app.run(host='localhost', debug=True, port=6000)
+    # app.run(host='localhost', debug=True, port=6000)
+    app.run(host='0.0.0.0', debug=False, port=3001)
