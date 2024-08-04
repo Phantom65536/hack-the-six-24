@@ -6,34 +6,34 @@ import {
   useTheme,
   CircularProgress,
 } from '@mui/material';
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 
-const socket = io('http://localhost:3000'); // Adjust the URL as necessary
+// const socket = io('http://localhost:3000'); // Adjust the URL as necessary
 
 const Dashcam = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const [isConnected, setIsConnected] = useState(false); // State to track WebSocket connection status
+  const [isConnected, setIsConnected] = useState(true); // State to track WebSocket connection status
   const theme = useTheme();
   const videoRef = useRef(null);
 
   const startReceivingVideo = () => {
-    socket.on('connect', () => {
-      setIsConnected(true);
-    });
+    // socket.on('connect', () => {
+    //   setIsConnected(true);
+    // });
 
-    socket.on('disconnect', () => {
-      setIsConnected(false);
-    });
+    // socket.on('disconnect', () => {
+    //   setIsConnected(false);
+    // });
 
-    socket.on('video-frame', (data) => {
+    // socket.on('video-frame', (data) => {
       if (videoRef.current) {
-        videoRef.current.src = `data:image/jpeg;base64,${data}`;
-      }
-    });
+        videoRef.current.src = "http://localhost:9000/video_feed";
+      // }
+    };
   };
 
   const stopReceivingVideo = () => {
-    socket.off('video-frame');
+    // socket.off('video-frame');
     if (videoRef.current) {
       videoRef.current.src = '';
     }
@@ -54,7 +54,7 @@ const Dashcam = () => {
     const startRecording = async () => {
       try {
         console.log('Start');
-        const response = await fetch('http://127.0.0.1:3000/start_recording', {
+        const response = await fetch('http://127.0.0.1:9000/start_recording', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ const Dashcam = () => {
     const stopRecording = async () => {
       try {
         console.log('Stop');
-        const response = await fetch('http://127.0.0.1:3000/stop_recording', {
+        const response = await fetch('http://127.0.0.1:9000/end_recording', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -79,6 +79,22 @@ const Dashcam = () => {
         });
         if (!response.ok) {
           throw new Error('Failed to stop recording');
+        }
+        else {
+            console.log('Recording stopped and uploaded to GCS');
+            const upload_data = await response.json();
+            console.log(upload_data)
+
+            const response_upload = await fetch('http://127.0.0.1:3001/api/upload', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+                body: JSON.stringify(upload_data)
+            });
+            console.log('Recording uploaded to mongoDB');
+            const mongobd_data = await response_upload.json();
+            console.log(mongobd_data)
         }
       } catch (error) {
         console.error('Error stopping recording:', error);
@@ -113,7 +129,7 @@ const Dashcam = () => {
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
+              objectFit: 'contain',
               display: isConnected ? 'block' : 'none',
             }}
           />
