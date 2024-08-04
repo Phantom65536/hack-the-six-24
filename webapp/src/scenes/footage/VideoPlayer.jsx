@@ -1,63 +1,44 @@
-import React from 'react';
-import { Box, Button, Typography } from '@mui/material';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import React, { useEffect, useState } from 'react';
 
-const VideoPlayer = ({ videoUrl, notifications }) => {
+const VideoPlayer = ({ url }) => {
+  const [videoSrc, setVideoSrc] = useState(null);
+
+  useEffect(() => {
+    const fetchVideo = async () => {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const videoBlob = await response.blob();
+        const videoUrl = URL.createObjectURL("https://storage.googleapis.com/hackthe6ix/camera_output_drowsy.mp4");
+        setVideoSrc(videoUrl);
+      } catch (error) {
+        console.error('Error fetching video:', error);
+      }
+    };
+
+    fetchVideo();
+
+    // Clean up the object URL when the component unmounts
+    return () => {
+      if (videoSrc) {
+        URL.revokeObjectURL(videoSrc);
+      }
+    };
+  }, [url, videoSrc]);
+
   return (
-    <Box sx={{ display: 'flex', height: '100vh', backgroundColor: '#000' }}>
-      <Box
-        sx={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Typography variant="h6" color="white" gutterBottom>
-          Live Video Stream
-        </Typography>
-        <Box
-          component="video"
-          sx={{ width: '80%', backgroundColor: 'black' }}
-          controls
-          src={videoUrl}
-        >
+    <div>
+      {videoSrc ? (
+        <video controls>
+          <source src={videoSrc} type="video/mp4" />
           Your browser does not support the video tag.
-        </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<PlayArrowIcon />}
-          sx={{ mt: 2 }}
-        >
-          Play
-        </Button>
-      </Box>
-      <Box sx={{ width: '300px', backgroundColor: '#f0f0f0', padding: '16px' }}>
-        <Typography variant="h6" color="textSecondary">
-          Notifications
-        </Typography>
-        <Box sx={{ mt: 2 }}>
-          {notifications && notifications.length > 0 ? (
-            notifications.map((notification, index) => (
-              <Typography
-                key={index}
-                variant="body2"
-                color="textSecondary"
-                sx={{ mb: 1 }}
-              >
-                {notification}
-              </Typography>
-            ))
-          ) : (
-            <Typography variant="body2" color="textSecondary">
-              Notifications will appear here
-            </Typography>
-          )}
-        </Box>
-      </Box>
-    </Box>
+        </video>
+      ) : (
+        <p>Loading video...</p>
+      )}
+    </div>
   );
 };
 
