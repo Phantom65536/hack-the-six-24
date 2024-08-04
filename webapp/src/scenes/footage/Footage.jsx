@@ -15,6 +15,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import Markdown from 'react-markdown';
 
 const Footage = () => {
   // const FLASK_URL = 'http://100.66.18.218:3001/api';
@@ -70,7 +71,7 @@ const Footage = () => {
         display="flex"
         backgroundColor={colors.primary[400]}
         borderRadius="3px"
-        height="8vh"
+        height="4em"
       >
         <InputBase
           sx={{ ml: 2, flex: 1 }}
@@ -95,7 +96,11 @@ const Footage = () => {
               image={require(`../../../public/temp${i%3 + 1}.png`)} // Placeholder image, you can replace this with actual video thumbnail if available
             />
             <CardContent>
-              <Typography gutterBottom variant="h5" component="div">
+              <Markdown>{video.title}</Markdown>
+              <Markdown>{video.query}</Markdown>
+              <Markdown>{video.response}</Markdown>
+              <Markdown>{video.summary}</Markdown>
+              {/* <Typography gutterBottom variant="h5" component="div">
                 {video.title}
               </Typography>
               <Typography variant="body2" color="text.primary">
@@ -106,7 +111,7 @@ const Footage = () => {
               </Typography>
               <Typography variant="body2" color="text.info">
                 {video.summary}
-              </Typography>
+              </Typography> */}
               <Link to={`/watch/${video.video_file_name}`} style={{ textDecoration: 'none' }}>
                 <Button
                   variant="contained"

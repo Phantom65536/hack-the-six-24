@@ -64,7 +64,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/watch/:id" element={<VideoPlayer />} />
+              <Route path="/watch/files/:id" element={<VideoPlayer />} />
             </Routes>
           </main>
         </div>

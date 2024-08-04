@@ -11,7 +11,7 @@ const VideoPlayer = ({ url }) => {
           throw new Error('Network response was not ok');
         }
         const videoBlob = await response.blob();
-        const videoUrl = URL.createObjectURL("https://storage.googleapis.com/hackthe6ix/camera_output_drowsy.mp4");
+        const videoUrl = URL.createObjectURL(videoBlob);
         setVideoSrc(videoUrl);
       } catch (error) {
         console.error('Error fetching video:', error);
@@ -26,7 +26,7 @@ const VideoPlayer = ({ url }) => {
         URL.revokeObjectURL(videoSrc);
       }
     };
-  }, [url, videoSrc]);
+  }, [url]);
 
   return (
     <div>
