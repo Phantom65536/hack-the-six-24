@@ -12,6 +12,7 @@ from google.generativeai import GenerativeModel
 from google.cloud import storage
 from flasgger import Swagger
 from pymongo import MongoClient
+import certifi
 
 app = Flask("backend_server")
 swagger = Swagger(app)
@@ -22,7 +23,7 @@ genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 
 model = GenerativeModel("gemini-1.5-flash-001")
 
-db = MongoClient(os.getenv('MONGODB_URI')).get_database(os.getenv('DB_NAME'))
+db = MongoClient(os.getenv('MONGODB_URI'), tlsCAFile=certifi.where()).get_database(os.getenv('DB_NAME'))
 drive_col = db.get_collection('driveRuns')
 
 @app.route('/api/upload', methods=['POST'])
