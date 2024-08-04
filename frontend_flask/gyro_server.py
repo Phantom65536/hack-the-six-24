@@ -21,9 +21,10 @@ def handle_gyroscope_data(data):
 def handle_disconnect():
     print('Client disconnected')
 
+@socketio.on('getGyroscopeData')
 def get_gyroscope_data():
     global gyroscope_data
-    return gyroscope_data
+    emit('gyroscopeData', gyroscope_data, broadcast=True)
 
 if __name__ == '__main__':
     socketio.run(app, port=4000, host='0.0.0.0')
