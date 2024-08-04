@@ -29,7 +29,7 @@ const Topbar = () => {
 
       getUserMetaData();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, getAccessTokenSilently]);
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
