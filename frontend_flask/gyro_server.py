@@ -26,4 +26,4 @@ def get_gyroscope_data():
     return gyroscope_data
 
 if __name__ == '__main__':
-    socketio.run(app, port=4000)
+    socketio.run(app, port=4000, host='0.0.0.0')
