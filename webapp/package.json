@@ -1,0 +1,72 @@
+{
+  "name": "webapp",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@auth0/auth0-react": "^2.2.4",
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "@fullcalendar/core": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/list": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.15",
+    "@grpc/grpc-js": "^1.11.1",
+    "@mui/icons-material": "^5.16.6",
+    "@mui/material": "^5.16.6",
+    "@mui/x-data-grid": "^7.12.0",
+    "@nivo/bar": "^0.87.0",
+    "@nivo/core": "^0.87.0",
+    "@nivo/geo": "^0.87.0",
+    "@nivo/pie": "^0.87.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.7.3",
+    "dotenv": "^16.4.5",
+    "formik": "^2.4.6",
+    "jwt-decode": "^4.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-lottie": "^1.2.4",
+    "react-pro-sidebar": "^0.7.1",
+    "react-router-dom": "^6.26.0",
+    "react-scripts": "^5.0.1",
+    "react-simple-animate": "^3.5.2",
+    "react-type-animation": "^3.2.0",
+    "react-youtube": "^10.1.0",
+    "socket.io-client": "^4.7.5",
+    "web-vitals": "^2.1.4",
+    "yup": "^1.4.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "sass": "^1.77.8",
+    "sass-loader": "^16.0.0",
+    "stream-browserify": "^3.0.0",
+    "webpack": "^5.93.0"
+  }
+}
