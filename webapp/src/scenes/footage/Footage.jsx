@@ -97,13 +97,13 @@ const Footage = () => {
               <Typography gutterBottom variant="h5" component="div">
                 {video.title}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.primary">
                 {video.query}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {video.response}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.info">
                 {video.summary}
               </Typography>
               <Link to={`/watch/${video.video_file_name}`} style={{ textDecoration: 'none' }}>
