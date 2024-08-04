@@ -124,7 +124,7 @@ class VideoCamera(object):
         credentials.refresh(Request())
         self.access_token = credentials.token
 
-        sio.connect('http://localhost:3000')
+        sio.connect('http://localhost:4000')
 
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
@@ -138,7 +138,7 @@ class VideoCamera(object):
     def start_recording(self):
         if self.recording_output is not None:
             print("Already recording")
-            return {"error": "Already recording"}
+            return {}
 
         out_name = f"camera_output_{datetime.now().isoformat()}.mp4"
         self.recording_file_name = out_name
@@ -150,7 +150,7 @@ class VideoCamera(object):
     def end_recording(self):
         if self.recording_output is None:
             print("Not recording")
-            return {"error": "Not recording"}
+            return {}
 
         self.recording_output.release()
         print("Recording released")
